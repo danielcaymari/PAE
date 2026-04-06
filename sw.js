@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eda-pro-v1';
+const CACHE_NAME = 'PAE-v1';
 const ASSETS = [
   './',
   './index.html',
