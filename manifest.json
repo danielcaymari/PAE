@@ -1,6 +1,6 @@
 {
-  "name": "PAE",
-  "short_name": "EDA-Pro",
+  "name": "^Proceso de Atención de Enfermería (PAE)",
+  "short_name": "PAE",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0f172a",
