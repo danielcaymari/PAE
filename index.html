@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAE-Master: Proceso de Atención de Enfermería</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
+    <meta name="theme-color" content="#c2855a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'], 
+                        heading: ['Montserrat', 'sans-serif'] 
+                    },
+                    colors: {
+                        warm: {
+                            50:  '#fdf8f2',
+                            100: '#f7ede0',
+                            200: '#efd9be',
+                            300: '#e5c49a',
+                            400: '#d9a872',
+                            500: '#c2855a',
+                            600: '#a86840',
+                            700: '#8a5030',
+                            800: '#6e3c22',
+                            900: '#4e2910',
+                        },
+                        cream: '#fdf6ec',
+                        darkbg:   '#1c1410',
+                        darkcard: '#2a1f17',
+                        darksec:  '#362a20',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --accent: #c2855a;
+            --accent-light: #f7ede0;
+        }
+        body { background-color: #fdf6ec; }
+        .dark body { background-color: #1c1410; }
+        .content-section { scroll-margin-top: 5rem; }
+        h1, h2, h3, h4 { font-family: 'Montserrat'; font-weight: 700; }
+        .nav-link.active { background-color: #c2855a; color: white; }
+        .step-card { transition: all 0.3s ease; }
+        .step-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(194,133,90,0.15); }
+        .badge { display: inline-flex; align-items: center; gap: 6px; background: #f7ede0; color: #8a5030; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px; }
+        .dark .badge { background: #362a20; color: #e5c49a; }
+        .timeline-item::before { content: ''; position: absolute; left: -1px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #c2855a, #e5c49a); }
+        details summary::-webkit-details-marker { display: none; }
+        .gradient-hero { background: linear-gradient(135deg, #6e3c22 0%, #c2855a 60%, #e5c49a 100%); }
+        .tag { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px; display: inline-block; margin: 2px; }
+        .nanda-card { border-left: 4px solid #c2855a; }
+        .nanda-card.real { border-color: #e07b4c; }
+        .nanda-card.riesgo { border-color: #d4a843; }
+        .nanda-card.bienestar { border-color: #7aaa6d; }
+        .progress-bar { height: 8px; border-radius: 4px; background: #efd9be; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #c2855a, #e5c49a); transition: width 1s ease; }
+        .quiz-option { transition: all 0.2s; }
+        .quiz-option.correct { border-color: #7aaa6d !important; background: #f0faf0 !important; }
+        .quiz-option.incorrect { border-color: #e07b4c !important; background: #fff5f0 !important; }
+        .dark .quiz-option.correct { background: #1a2e1a !important; }
+        .dark .quiz-option.incorrect { background: #2e1a14 !important; }
+        .floating-icon { animation: float 4s ease-in-out infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .section-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #c2855a; margin-bottom: 0.5rem; display: block; }
+        .dark .section-label { color: #e5c49a; }
+        table th { background: #f7ede0; }
+        .dark table th { background: #362a20; }
+        table tr:nth-child(even) td { background: #fdf8f4; }
+        .dark table tr:nth-child(even) td { background: #2a2018; }
+    </style>
+</head>
+<body class="text-stone-700 dark:bg-darkbg dark:text-stone-300 transition-colors antialiased font-sans">
+
+    <!-- ===== HEADER ===== -->
+    <header class="fixed top-0 w-full bg-cream/90 dark:bg-darkbg/90 backdrop-blur-md shadow-sm z-50 h-16 flex items-center justify-between px-4 lg:px-8 border-b border-warm-200 dark:border-warm-900">
+        <div class="flex items-center gap-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-warm-600 text-2xl p-2"><i class="fas fa-bars"></i></button>
+            <div class="bg-warm-600 text-white p-2 rounded-lg shadow-md shadow-warm-500/30"><i class="fas fa-user-nurse"></i></div>
+            <h1 class="text-xl dark:text-white uppercase tracking-tight">PAE<span class="text-warm-500">-MASTER</span></h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="hidden sm:inline text-xs text-warm-500 font-semibold tracking-widest uppercase">Cuba · 2026</span>
+            <button id="theme-toggle" class="p-2 rounded-full bg-warm-100 dark:bg-darksec transition-transform active:scale-90">
+                <i class="fas fa-moon dark:hidden text-warm-600"></i>
+                <i class="fas fa-sun hidden dark:block text-amber-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex pt-16 h-screen">
+        <!-- ===== SIDEBAR ===== -->
+        <aside id="sidebar" class="fixed lg:static w-72 h-full bg-cream dark:bg-darkcard border-r border-warm-200 dark:border-warm-900/50 transform -translate-x-full lg:translate-x-0 transition-transform z-40 overflow-y-auto pb-20">
+            <nav class="p-4 space-y-1">
+                <p class="text-[10px] font-bold text-warm-400 uppercase tracking-widest mb-4 mt-2 px-4">Fundamentos</p>
+                <a href="#introduccion" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-book-medical w-8 text-warm-500"></i> Introducción
+                </a>
+                <a href="#historia" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-landmark w-8 text-warm-500"></i> Historia y Contexto
+                </a>
+                <a href="#teorias" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-atom w-8 text-warm-500"></i> Bases Teóricas
+                </a>
+                
+                <p class="text-[10px] font-bold text-warm-400 uppercase tracking-widest mb-4 mt-8 px-4">Método Científico</p>
+                <a href="#etapas" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-layer-group w-8 text-warm-500"></i> Etapas del PAE
+                </a>
+                <a href="#valoracion" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-clipboard-list w-8 text-warm-500"></i> Valoración Profunda
+                </a>
+                <a href="#diagnostico" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-microscope w-8 text-warm-500"></i> Diagnósticos NANDA
+                </a>
+                <a href="#planificacion" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-route w-8 text-warm-500"></i> Planificación NOC/NIC
+                </a>
+                <a href="#procedimientos" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-hand-holding-medical w-8 text-warm-500"></i> Procedimientos
+                </a>
+                
+                <p class="text-[10px] font-bold text-warm-400 uppercase tracking-widest mb-4 mt-8 px-4">Casos y Práctica</p>
+                <a href="#casos" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-file-medical-alt w-8 text-warm-500"></i> Casos Clínicos
+                </a>
+                <a href="#errores" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-exclamation-triangle w-8 text-warm-500"></i> Errores Frecuentes
+                </a>
+
+                <p class="text-[10px] font-bold text-warm-400 uppercase tracking-widest mb-4 mt-8 px-4">Validación</p>
+                <a href="#evaluacion" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm font-semibold text-warm-700 dark:text-warm-400 transition-colors">
+                    <i class="fas fa-tasks w-8"></i> Autoevaluación
+                </a>
+                
+                <p class="text-[10px] font-bold text-warm-400 uppercase tracking-widest mb-4 mt-8 px-4">Fuentes</p>
+                <a href="#glosario" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-spell-check w-8 text-warm-500"></i> Glosario Técnico
+                </a>
+                <a href="#bibliografia" class="nav-link flex items-center px-4 py-3 rounded-xl hover:bg-warm-100 dark:hover:bg-darksec text-sm transition-colors">
+                    <i class="fas fa-bookmark w-8 text-warm-500"></i> Bibliografía
+                </a>
+            </nav>
+        </aside>
+
+        <div id="overlay" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden"></div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="flex-1 overflow-y-auto p-4 lg:p-10 scroll-smooth">
+            <div class="max-w-4xl mx-auto space-y-12 pb-20">
+
+                <!-- HERO -->
+                <div class="gradient-hero rounded-[2.5rem] p-10 text-white shadow-2xl shadow-warm-900/30 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <span class="tag">Enfermería Científica</span>
+                        <span class="tag">Cuba 2026</span>
+                        <span class="tag">MINSAP</span>
+                        <h2 class="text-4xl mt-5 mb-4 leading-tight">Proceso de Atención<br>de Enfermería</h2>
+                        <p class="text-warm-100 opacity-90 text-lg leading-relaxed max-w-2xl mb-6">
+                            Herramienta educativa de referencia para el dominio del cuidado científico, sistemático y humanista. Diseñada para estudiantes y profesionales de enfermería bajo el marco del sistema de salud cubano y los estándares internacionales NANDA·NOC·NIC.
+                        </p>
+                        <div class="flex flex-wrap gap-4 mt-4">
+                            <div class="bg-white/15 rounded-2xl px-5 py-3 text-sm font-semibold backdrop-blur-sm">
+                                <i class="fas fa-layer-group mr-2 opacity-80"></i>5 Etapas del Ciclo
+                            </div>
+                            <div class="bg-white/15 rounded-2xl px-5 py-3 text-sm font-semibold backdrop-blur-sm">
+                                <i class="fas fa-file-medical-alt mr-2 opacity-80"></i>Casos Clínicos Reales
+                            </div>
+                            <div class="bg-white/15 rounded-2xl px-5 py-3 text-sm font-semibold backdrop-blur-sm">
+                                <i class="fas fa-vial mr-2 opacity-80"></i>Autoevaluación Interactiva
+                            </div>
+                        </div>
+                    </div>
+                    <i class="fas fa-notes-medical floating-icon absolute -bottom-4 -right-4 text-white/10 text-[12rem]"></i>
+                </div>
+
+                <!-- ===== INTRODUCCIÓN ===== -->
+                <section id="introduccion" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-book-medical mr-1"></i>Punto de partida</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Introducción y Fundamentos del PAE</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>El <strong class="text-warm-700 dark:text-warm-300">Proceso de Atención de Enfermería (PAE)</strong> es un método sistemático, deliberado y organizado para brindar cuidados individualizados, centrados en el ser humano como unidad bio-psico-social y espiritual. Surgió como respuesta a la necesidad de dotar a la enfermería de un sustento científico propio que trascendiera la simple ejecución de tareas médicas delegadas, transformando la disciplina en una ciencia autónoma con cuerpo teórico sólido.</p>
+                        <p>Su esencia radica en el <strong>pensamiento crítico aplicado</strong>: la enfermera o enfermero no solo actúa, sino que observa, analiza, razona, decide y evalúa. Este ciclo continuo de reflexión-acción es lo que diferencia al profesional de enfermería moderno del auxiliar sanitario del siglo pasado. El PAE obliga a preguntarse siempre el porqué de cada intervención, convirtiendo cada contacto con el paciente en una oportunidad diagnóstica y terapéutica.</p>
+                        <div class="bg-warm-50 dark:bg-warm-900/20 p-6 rounded-2xl border-l-4 border-warm-500 italic text-sm">
+                            "En Cuba, el PAE se aplica bajo un enfoque humanista profundamente arraigado en la medicina social, priorizando la atención primaria de salud, la participación familiar y comunitaria, y la satisfacción integral de las necesidades básicas del individuo, la familia y la comunidad como unidades inseparables de intervención."
+                        </div>
+                        <p>A diferencia de un simple protocolo de actuación, el PAE es <strong>dinámico, flexible y continuo</strong>. No termina cuando el paciente es dado de alta; se extiende a la educación para la salud, al seguimiento en el consultorio del médico de familia y a la acción comunitaria. Sus cinco etapas —valoración, diagnóstico, planificación, ejecución y evaluación— no son compartimentos estancos sino fases que se retroalimentan en un ciclo perpetuo de mejora del cuidado.</p>
+                        <p>La implementación del PAE en el contexto cubano tiene particularidades únicas: se enmarca en un sistema de salud público, universal y gratuito; se desarrolla en estructuras como el Consultorio del Médico y la Enfermera de la Familia, los Policlínicos y los Hospitales; y responde a programas priorizados del MINSAP como el Programa Materno Infantil, el Programa de Atención al Adulto Mayor y el Programa de Control de Enfermedades Crónicas No Transmisibles. Conocer el PAE es conocer el corazón del sistema de salud cubano.</p>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4 text-center">
+                                <div class="text-3xl font-bold text-warm-600">5</div>
+                                <div class="text-xs text-stone-500 mt-1">Etapas del ciclo</div>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4 text-center">
+                                <div class="text-3xl font-bold text-warm-600">+200</div>
+                                <div class="text-xs text-stone-500 mt-1">Dx NANDA validados</div>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4 text-center">
+                                <div class="text-3xl font-bold text-warm-600">14</div>
+                                <div class="text-xs text-stone-500 mt-1">Necesidades básicas (Henderson)</div>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4 text-center">
+                                <div class="text-3xl font-bold text-warm-600">1955</div>
+                                <div class="text-xs text-stone-500 mt-1">Año del primer modelo formal</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== HISTORIA ===== -->
+                <section id="historia" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-landmark mr-1"></i>Contexto histórico</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Historia del PAE y su Evolución en Cuba</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>La historia del PAE es, en esencia, la historia de la lucha de la enfermería por ser reconocida como ciencia. Durante siglos, el cuidado fue considerado una actividad empírica, vocacional e incluso doméstica, relegada a un papel subordinado frente a la medicina. Fue <strong>Florence Nightingale</strong> (1820–1910) quien dio el primer paso hacia la sistematización del cuidado, demostrando durante la guerra de Crimea que la observación metódica y las mejoras ambientales reducían drásticamente la mortalidad. Sus notas de enfermería son, en muchos sentidos, el embrión del PAE.</p>
+                        <p>El salto cualitativo ocurre en la segunda mitad del siglo XX. En 1955, <strong>Lydia Hall</strong> utiliza por primera vez el concepto de "proceso de enfermería". En 1967, <strong>Yura y Walsh</strong> lo estructuran en cuatro fases. La inclusión de la evaluación como quinta fase, completando el ciclo, se consolida en los años setenta. La publicación de la taxonomía <strong>NANDA</strong> (North American Nursing Diagnosis Association) en 1982 representó un hito: por primera vez, los diagnósticos de enfermería tenían un lenguaje estandarizado, universal y científicamente respaldado.</p>
+                        <div class="relative pl-8 mt-8 space-y-8 border-l-2 border-warm-200 dark:border-warm-800">
+                            <div class="timeline-item relative">
+                                <div class="absolute -left-[2.15rem] top-1 w-4 h-4 rounded-full bg-warm-500 border-4 border-cream dark:border-darkcard"></div>
+                                <div class="text-xs font-bold text-warm-500 mb-1">1955</div>
+                                <div class="font-semibold">Lydia Hall acuña el término "proceso de enfermería"</div>
+                                <p class="text-sm text-stone-500 mt-1">Primera formulación explícita del método científico aplicado al cuidado de enfermería.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[2.15rem] top-1 w-4 h-4 rounded-full bg-warm-500 border-4 border-cream dark:border-darkcard"></div>
+                                <div class="text-xs font-bold text-warm-500 mb-1">1967</div>
+                                <div class="font-semibold">Yura y Walsh estructuran el PAE en 4 fases</div>
+                                <p class="text-sm text-stone-500 mt-1">Valoración, Planificación, Implementación y Evaluación. La primera sistematización académica completa.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[2.15rem] top-1 w-4 h-4 rounded-full bg-warm-500 border-4 border-cream dark:border-darkcard"></div>
+                                <div class="text-xs font-bold text-warm-500 mb-1">1982</div>
+                                <div class="font-semibold">NANDA publica la primera taxonomía de diagnósticos</div>
+                                <p class="text-sm text-stone-500 mt-1">Lenguaje enfermero unificado. El diagnóstico de enfermería queda separado definitivamente del diagnóstico médico.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[2.15rem] top-1 w-4 h-4 rounded-full bg-warm-600 border-4 border-cream dark:border-darkcard"></div>
+                                <div class="text-xs font-bold text-warm-600 mb-1">1990s — Cuba</div>
+                                <div class="font-semibold">El MINSAP integra oficialmente el PAE en el currículo</div>
+                                <p class="text-sm text-stone-500 mt-1">Las escuelas de enfermería cubanas adoptan el PAE como eje metodológico central. Se adapta al modelo de necesidades básicas y a la estructura del Sistema Nacional de Salud.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[2.15rem] top-1 w-4 h-4 rounded-full bg-warm-700 border-4 border-cream dark:border-darkcard"></div>
+                                <div class="text-xs font-bold text-warm-700 mb-1">2000–Presente</div>
+                                <div class="font-semibold">Consolidación e investigación nacional</div>
+                                <p class="text-sm text-stone-500 mt-1">Publicaciones de ECIMED, tesis doctorales y artículos en la Revista Cubana de Enfermería consolidan el modelo cubano del PAE, con énfasis en la atención primaria y el enfoque familiar-comunitario.</p>
+                            </div>
+                        </div>
+                        <p class="mt-6">En Cuba, la implementación del PAE no es solo un ejercicio académico: es una exigencia del sistema. El Programa Director de Enfermería establece que todo profesional de enfermería debe documentar su actuación mediante el registro del PAE, garantizando la continuidad del cuidado, la trazabilidad clínica y la base para la investigación científica en enfermería. Este compromiso institucional convierte a Cuba en uno de los países latinoamericanos con mayor coherencia entre el currículo académico y la práctica clínica en enfermería.</p>
+                    </div>
+                </section>
+
+                <!-- ===== BASES TEÓRICAS ===== -->
+                <section id="teorias" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-atom mr-1"></i>Marco conceptual</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Bases Teóricas y Modelos de Referencia</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>El PAE no existe en el vacío: se sustenta sobre un conjunto de teorías y modelos de enfermería que le dan sustancia filosófica y metodológica. Comprender estos fundamentos permite al profesional no solo aplicar mecánicamente el proceso, sino razonar con profundidad sobre cada decisión clínica y adaptarla al contexto del paciente.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6 border border-warm-100 dark:border-warm-900/40">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-warm-200 dark:bg-warm-800 rounded-xl flex items-center justify-center text-warm-700 dark:text-warm-200 font-bold text-sm">VH</div>
+                                    <div>
+                                        <div class="font-bold">Virginia Henderson</div>
+                                        <div class="text-xs text-warm-500">14 Necesidades Básicas</div>
+                                    </div>
+                                </div>
+                                <p class="text-sm leading-relaxed">Modelo central en Cuba. Propone que la función específica de la enfermera es ayudar al individuo sano o enfermo a realizar aquellas actividades que contribuyen a su salud o recuperación que él realizaría sin ayuda si tuviera la fuerza, voluntad o conocimiento necesarios. Las 14 necesidades básicas —desde respirar hasta aprender— conforman el marco de valoración más utilizado en nuestras instituciones.</p>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6 border border-warm-100 dark:border-warm-900/40">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-warm-200 dark:bg-warm-800 rounded-xl flex items-center justify-center text-warm-700 dark:text-warm-200 font-bold text-sm">DO</div>
+                                    <div>
+                                        <div class="font-bold">Dorothea Orem</div>
+                                        <div class="text-xs text-warm-500">Autocuidado</div>
+                                    </div>
+                                </div>
+                                <p class="text-sm leading-relaxed">Su teoría del déficit de autocuidado postula que los individuos tienen capacidades innatas para cuidarse a sí mismos. Cuando estas capacidades son insuficientes, surge la necesidad de la enfermería. Relevante para los programas de salud familiar y comunitaria, donde empoderar al paciente para que asuma su propio cuidado es un objetivo terapéutico primordial.</p>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6 border border-warm-100 dark:border-warm-900/40">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-warm-200 dark:bg-warm-800 rounded-xl flex items-center justify-center text-warm-700 dark:text-warm-200 font-bold text-sm">CR</div>
+                                    <div>
+                                        <div class="font-bold">Callista Roy</div>
+                                        <div class="text-xs text-warm-500">Modelo de Adaptación</div>
+                                    </div>
+                                </div>
+                                <p class="text-sm leading-relaxed">Concibe al ser humano como un sistema adaptativo que responde a estímulos del entorno. La enfermería facilita la adaptación en cuatro modos: fisiológico, autoconcepto, desempeño de roles e interdependencia. Útil en contextos de enfermedad crónica, discapacidad y procesos de rehabilitación prolongada.</p>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6 border border-warm-100 dark:border-warm-900/40">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-warm-200 dark:bg-warm-800 rounded-xl flex items-center justify-center text-warm-700 dark:text-warm-200 font-bold text-sm">JP</div>
+                                    <div>
+                                        <div class="font-bold">Jean Watson</div>
+                                        <div class="text-xs text-warm-500">Ciencia del Cuidado Humano</div>
+                                    </div>
+                                </div>
+                                <p class="text-sm leading-relaxed">Postula que el cuidado es el ideal moral de la enfermería y que la relación terapéutica entre la enfermera y el paciente trasciende lo técnico para convertirse en un encuentro espiritual. Sus 10 factores caritativos de cuidado recuerdan que detrás de cada diagnóstico hay una persona con historia, miedo y esperanza. Profundamente resonante con el humanismo de la escuela cubana.</p>
+                            </div>
+                        </div>
+                        <div class="bg-warm-50 dark:bg-darksec p-6 rounded-2xl mt-4">
+                            <h4 class="font-bold mb-3 text-warm-700 dark:text-warm-300">La Tríada Conceptual del PAE en Cuba</h4>
+                            <p class="text-sm leading-relaxed">En la práctica clínica cubana, el PAE se sustenta en tres pilares conceptuales que no pueden separarse: el <strong>enfoque bio-psico-social</strong> del paciente (heredado del marxismo y la salud pública), el <strong>modelo de necesidades de Henderson</strong> como guía de valoración y, más recientemente, la integración del <strong>lenguaje NANDA·NOC·NIC</strong> para garantizar la compatibilidad internacional de los registros clínicos. Esta combinación produce un enfoque híbrido, robusto y profundamente adaptado a la realidad cubana.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== ETAPAS ===== -->
+                <section id="etapas" class="content-section space-y-6">
+                    <span class="section-label px-2"><i class="fas fa-layer-group mr-1"></i>El núcleo del método</span>
+                    <h2 class="text-2xl px-2 text-stone-800 dark:text-stone-100">Las 5 Etapas del Ciclo Clínico</h2>
+                    <p class="px-2 text-stone-500 dark:text-stone-400 text-sm leading-relaxed max-w-2xl">El PAE se articula en cinco etapas interconectadas que forman un ciclo dinámico. No son pasos lineales que se ejecutan una sola vez: son fases recurrentes que se retroalimentan constantemente durante todo el proceso de atención.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="step-card bg-white dark:bg-darkcard p-6 rounded-3xl border border-warm-100 dark:border-warm-900/40 shadow-sm">
+                            <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-2xl flex items-center justify-center text-xl mb-4"><i class="fas fa-clipboard-list"></i></div>
+                            <div class="badge mb-3">Etapa 1</div>
+                            <h4 class="text-lg mb-2 text-stone-800 dark:text-stone-100">Valoración</h4>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">Recogida sistemática de datos subjetivos y objetivos mediante entrevista clínica estructurada, observación directa y el examen físico cefalocaudal por sistemas. Es la base de todo el proceso: un error aquí contamina todas las etapas siguientes. Los datos deben ser verificables, pertinentes y suficientes para elaborar un juicio diagnóstico fundamentado.</p>
+                        </div>
+                        <div class="step-card bg-white dark:bg-darkcard p-6 rounded-3xl border border-warm-100 dark:border-warm-900/40 shadow-sm">
+                            <div class="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-2xl flex items-center justify-center text-xl mb-4"><i class="fas fa-microscope"></i></div>
+                            <div class="badge mb-3">Etapa 2</div>
+                            <h4 class="text-lg mb-2 text-stone-800 dark:text-stone-100">Diagnóstico de Enfermería</h4>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">Juicio clínico sobre las respuestas humanas del individuo, familia o comunidad ante procesos vitales o problemas de salud reales o potenciales. Se formula mediante la taxonomía NANDA o, en el contexto cubano, siguiendo las guías clínicas del MINSAP. El diagnóstico de enfermería NO es un diagnóstico médico: identifica respuestas humanas, no enfermedades.</p>
+                        </div>
+                        <div class="step-card bg-white dark:bg-darkcard p-6 rounded-3xl border border-warm-100 dark:border-warm-900/40 shadow-sm">
+                            <div class="w-12 h-12 bg-warm-100 dark:bg-warm-900/30 text-warm-600 rounded-2xl flex items-center justify-center text-xl mb-4"><i class="fas fa-route"></i></div>
+                            <div class="badge mb-3">Etapa 3</div>
+                            <h4 class="text-lg mb-2 text-stone-800 dark:text-stone-100">Planificación</h4>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">Diseño individualizado del plan de cuidados: establecimiento de prioridades según Maslow y el criterio clínico, formulación de objetivos (resultados esperados/NOC) medibles y con límite temporal, y selección de intervenciones de enfermería (NIC) basadas en evidencia. El plan debe ser realista, alcanzable y comunicado a todo el equipo de salud para garantizar la continuidad del cuidado.</p>
+                        </div>
+                        <div class="step-card bg-white dark:bg-darkcard p-6 rounded-3xl border border-warm-100 dark:border-warm-900/40 shadow-sm">
+                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl flex items-center justify-center text-xl mb-4"><i class="fas fa-syringe"></i></div>
+                            <div class="badge mb-3">Etapa 4</div>
+                            <h4 class="text-lg mb-2 text-stone-800 dark:text-stone-100">Ejecución</h4>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">Puesta en práctica de las intervenciones planificadas: cuidados directos, administración de terapia prescrita, educación para la salud, coordinación con otros miembros del equipo y gestión del entorno. Toda acción debe estar documentada en el registro clínico, incluyendo la respuesta inmediata del paciente. La ejecución sin documentación es, técnicamente, una ejecución incompleta.</p>
+                        </div>
+                        <div class="step-card bg-white dark:bg-darkcard p-6 rounded-3xl border border-warm-100 dark:border-warm-900/40 shadow-sm md:col-span-2">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 mt-1"><i class="fas fa-chart-line"></i></div>
+                                <div>
+                                    <div class="badge mb-3">Etapa 5</div>
+                                    <h4 class="text-lg mb-2 text-stone-800 dark:text-stone-100">Evaluación — El Motor del Ciclo</h4>
+                                    <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">Determinación sistemática del grado en que el paciente ha alcanzado los resultados esperados. Es la etapa que cierra el ciclo y, simultáneamente, lo reinicia: si los objetivos se lograron, el diagnóstico puede cerrarse; si no, es necesario re-valorar, ajustar el diagnóstico y replantear el plan. La evaluación transforma el PAE de un protocolo estático en un proceso verdaderamente adaptativo. En Cuba, la evaluación incluye también la satisfacción del paciente y la familia como indicador de calidad.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== VALORACIÓN PROFUNDA ===== -->
+                <section id="valoracion" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-clipboard-list mr-1"></i>Etapa 1 en detalle</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Valoración: Recolección e Interpretación de Datos</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>La valoración es el cimiento del PAE. Una valoración completa, precisa y sistematizada es la diferencia entre un plan de cuidados que transforma la experiencia del paciente y uno que simplemente llena formularios. Se estructura en dos tipos fundamentales de datos que deben complementarse mutuamente:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6">
+                                <h4 class="font-bold text-warm-700 dark:text-warm-300 mb-3 flex items-center gap-2"><i class="fas fa-comment-medical text-warm-500"></i> Datos Subjetivos</h4>
+                                <p class="text-sm leading-relaxed">Lo que el paciente refiere: síntomas, percepción del dolor (escala EVA 0-10), historia de salud, antecedentes patológicos personales y familiares, hábitos tóxicos, situación socioeconómica, red de apoyo familiar, expectativas y miedos. Incluyen también la información de familiares o cuidadores cuando el paciente no puede comunicarse. Deben registrarse entre comillas y con las palabras exactas del paciente cuando sea posible.</p>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6">
+                                <h4 class="font-bold text-warm-700 dark:text-warm-300 mb-3 flex items-center gap-2"><i class="fas fa-stethoscope text-warm-500"></i> Datos Objetivos</h4>
+                                <p class="text-sm leading-relaxed">Lo que la enfermera observa y mide: signos vitales (TA, FC, FR, Tª, SatO₂), peso, talla, IMC, coloración de piel y mucosas, estado de conciencia (escala de Glasgow), capacidad funcional, estado nutricional, integridad de la piel, resultado de exámenes complementarios. Son medibles, verificables y reproducibles por otro observador competente.</p>
+                            </div>
+                        </div>
+
+                        <h4 class="font-bold text-stone-800 dark:text-stone-100 mt-4">Las 14 Necesidades Básicas de Virginia Henderson</h4>
+                        <p class="text-sm">En Cuba, el modelo de Henderson es el marco de valoración por excelencia. Cada necesidad debe explorarse para identificar si está satisfecha, parcialmente satisfecha o insatisfecha:</p>
+                        <div class="overflow-x-auto mt-3 rounded-2xl border border-warm-100 dark:border-warm-900/40">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left p-4 text-warm-700 dark:text-warm-300 font-bold rounded-tl-2xl">N°</th>
+                                        <th class="text-left p-4 text-warm-700 dark:text-warm-300 font-bold">Necesidad</th>
+                                        <th class="text-left p-4 text-warm-700 dark:text-warm-300 font-bold rounded-tr-2xl">Indicadores de valoración</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-stone-600 dark:text-stone-400">
+                                    <tr><td class="p-3 font-bold text-warm-500">1</td><td class="p-3">Respirar normalmente</td><td class="p-3">FR, ritmo, profundidad, uso de músculos accesorios, SatO₂</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">2</td><td class="p-3">Comer y beber adecuadamente</td><td class="p-3">IMC, apetito, hidratación, alergias alimentarias, dentición</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">3</td><td class="p-3">Eliminar desechos corporales</td><td class="p-3">Patrón urinario e intestinal, características, continencia</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">4</td><td class="p-3">Moverse y mantener postura</td><td class="p-3">Movilidad, equilibrio, fuerza muscular, riesgo de caídas</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">5</td><td class="p-3">Dormir y descansar</td><td class="p-3">Calidad del sueño, insomnio, fatiga, uso de hipnóticos</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">6</td><td class="p-3">Elegir ropa adecuada</td><td class="p-3">Autocuidado, autonomía, adaptación a condiciones físicas</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">7</td><td class="p-3">Mantener temperatura corporal</td><td class="p-3">Temperatura, mecanismos de termorregulación, diaforesis</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">8</td><td class="p-3">Mantener higiene corporal</td><td class="p-3">Estado de piel, mucosas, higiene personal, integridad cutánea</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">9</td><td class="p-3">Evitar peligros del entorno</td><td class="p-3">Seguridad, riesgo de infección, riesgo de autolesión</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">10</td><td class="p-3">Comunicarse con otros</td><td class="p-3">Lenguaje verbal/no verbal, audición, visión, ansiedad</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">11</td><td class="p-3">Actuar según valores y creencias</td><td class="p-3">Religión, cultura, valores éticos, angustia espiritual</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">12</td><td class="p-3">Trabajar y sentirse realizado</td><td class="p-3">Autoestima, rol social, situación laboral, proyecto de vida</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">13</td><td class="p-3">Jugar y participar en actividades</td><td class="p-3">Ocio, relaciones sociales, actividad recreativa</td></tr>
+                                    <tr><td class="p-3 font-bold text-warm-500">14</td><td class="p-3">Aprender, descubrir, satisfacer curiosidad</td><td class="p-3">Nivel educacional, comprensión de su enfermedad, motivación</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/40 rounded-2xl p-5 mt-4">
+                            <h4 class="font-bold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2"><i class="fas fa-lightbulb"></i> Técnicas de Examen Físico en la Valoración</h4>
+                            <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">El examen físico cefalocaudal por sistemas utiliza cuatro técnicas fundamentales que deben aplicarse en este orden para el abdomen (y libre para el resto): <strong>Inspección</strong> (observación visual sistemática), <strong>Auscultación</strong> (con fonendoscopio), <strong>Percusión</strong> (directa o indirecta) y <strong>Palpación</strong> (superficial y profunda). Las maniobras especiales —como las <em>Maniobras de Leopold</em> en la mujer embarazada para determinar presentación, posición y encajamiento fetal— se incorporan según el contexto clínico.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== DIAGNÓSTICOS NANDA ===== -->
+                <section id="diagnostico" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-microscope mr-1"></i>Etapa 2 en detalle</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Diagnósticos de Enfermería: Taxonomía NANDA</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>El diagnóstico de enfermería es el juicio clínico sobre una respuesta humana. No diagnosticamos enfermedades —eso es competencia médica— sino las respuestas del individuo, familia o comunidad ante esas enfermedades o ante los procesos vitales. La diferencia no es semántica: es filosófica y define el territorio autónomo de la enfermería.</p>
+                        <p>La taxonomía NANDA-I (actualmente en su II revisión) organiza los diagnósticos en 13 dominios y 47 clases. Cada diagnóstico se formula mediante la <strong>estructura PES</strong>: <strong>P</strong>roblema (etiqueta diagnóstica), <strong>E</strong>tiología (causa o factor relacionado) y <strong>S</strong>intomatología (características definitorias o factores de riesgo).</p>
+
+                        <h4 class="font-bold text-stone-800 dark:text-stone-100 mt-4">Tipos de Diagnósticos de Enfermería</h4>
+                        <div class="space-y-4 mt-3">
+                            <div class="nanda-card real bg-warm-50 dark:bg-darksec rounded-2xl p-5">
+                                <div class="flex items-start gap-3">
+                                    <span class="badge">Real</span>
+                                    <div>
+                                        <p class="text-sm font-semibold mb-1">Problema presente y verificable con datos objetivos y subjetivos</p>
+                                        <p class="text-xs leading-relaxed">Se usa la fórmula <em>P relacionado con E manifestado por S</em>. Ejemplo: <strong>"Dolor agudo (P) relacionado con agentes lesivos físicos: herida quirúrgica abdominal (E) manifestado por expresión facial de dolor, EVA 8/10 y protección de la zona (S)."</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="nanda-card riesgo bg-warm-50 dark:bg-darksec rounded-2xl p-5">
+                                <div class="flex items-start gap-3">
+                                    <span class="badge">Riesgo</span>
+                                    <div>
+                                        <p class="text-sm font-semibold mb-1">Problema potencial con factores de riesgo identificados pero sin manifestaciones actuales</p>
+                                        <p class="text-xs leading-relaxed">Se usa la fórmula <em>Riesgo de P relacionado con factores de riesgo</em>. Ejemplo: <strong>"Riesgo de infección relacionado con procedimiento invasivo (catéter venoso central) y estado de inmunosupresión."</strong> Es aquí donde la enfermería demuestra su valor preventivo: intervenimos antes de que el problema ocurra.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="nanda-card bienestar bg-warm-50 dark:bg-darksec rounded-2xl p-5">
+                                <div class="flex items-start gap-3">
+                                    <span class="badge">Bienestar / Salud</span>
+                                    <div>
+                                        <p class="text-sm font-semibold mb-1">Deseo del paciente de mejorar un nivel de bienestar ya establecido</p>
+                                        <p class="text-xs leading-relaxed">Se usa la fórmula <em>Disposición para mejorar P</em>. Ejemplo: <strong>"Disposición para mejorar la lactancia materna manifestado por la expresión de la madre de querer aumentar el suministro de leche."</strong> Estos diagnósticos reflejan la dimensión promotora y salutogénica de la enfermería.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="font-bold text-stone-800 dark:text-stone-100 mt-5">Diagnósticos NANDA más Frecuentes en la Práctica Cubana</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Dolor agudo / Dolor crónico</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Deterioro de la integridad cutánea</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Riesgo de infección</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Déficit de autocuidado: baño/higiene</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Ansiedad / Temor</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Deterioro de la movilidad física</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Desequilibrio nutricional: ingesta inferior a las necesidades</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Patrón de sexualidad ineficaz (gestante)</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Conocimientos deficientes sobre el tratamiento</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-warm-50 dark:bg-darksec rounded-xl p-3">
+                                <i class="fas fa-circle text-warm-400 text-xs"></i>
+                                <span>Riesgo de caídas</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== PLANIFICACIÓN ===== -->
+                <section id="planificacion" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-route mr-1"></i>Etapa 3 en detalle</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Planificación del Cuidado: NOC y NIC</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>La planificación transforma el diagnóstico en acción. Es el momento en que la enfermera diseña la estrategia: qué quiere lograr (resultados NOC), en qué tiempo y mediante qué intervenciones (NIC). Un plan de cuidados bien elaborado es la diferencia entre la atención reactiva —que solo responde a problemas cuando ya ocurrieron— y la atención proactiva, que los anticipa, previene y gestiona.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6 border-t-4 border-warm-400">
+                                <h4 class="font-bold text-warm-700 dark:text-warm-300 mb-3">NOC — Resultados Esperados</h4>
+                                <p class="text-sm leading-relaxed">Los resultados NOC (Nursing Outcomes Classification) son los estados, conductas o percepciones del paciente medibles a lo largo de un continuum de respuesta, como consecuencia de las intervenciones de enfermería. Cada resultado tiene indicadores con escala de Likert (1–5). Ejemplo: para el diagnóstico "Dolor agudo", el resultado NOC sería <em>"Control del dolor"</em> con indicadores como "El paciente reportará EVA ≤ 3/10 a las 48 horas del postoperatorio."</p>
+                            </div>
+                            <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-6 border-t-4 border-warm-600">
+                                <h4 class="font-bold text-warm-700 dark:text-warm-300 mb-3">NIC — Intervenciones de Enfermería</h4>
+                                <p class="text-sm leading-relaxed">Las intervenciones NIC (Nursing Interventions Classification) son tratamientos realizados por la enfermera basados en el juicio clínico y el conocimiento, en beneficio del paciente. Incluyen intervenciones directas (procedimientos aplicados al paciente), indirectas (coordinación, gestión) y comunitarias. Cada NIC tiene actividades específicas: por ejemplo, la intervención <em>"Manejo del dolor"</em> incluye actividades como administrar analgesia prescrita, aplicar técnicas no farmacológicas y valorar la eficacia cada 30 minutos.</p>
+                            </div>
+                        </div>
+
+                        <h4 class="font-bold text-stone-800 dark:text-stone-100 mt-4">Priorización según Maslow</h4>
+                        <p class="text-sm leading-relaxed">Cuando el paciente tiene múltiples diagnósticos de enfermería —lo cual es habitual— es necesario priorizarlos. La jerarquía de necesidades de Maslow ofrece un marco útil: las necesidades fisiológicas (vía aérea, circulación, respiración) tienen prioridad absoluta; luego vienen las de seguridad y protección; después las relacionales; y finalmente las de autoestima y autorrealización. Un paciente con "Riesgo de aspiración" y "Ansiedad" necesita que primero se aborde la vía aérea, no el estado emocional, por más que ambos sean importantes.</p>
+
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-5 mt-2">
+                            <h4 class="font-bold mb-2 text-warm-700 dark:text-warm-300">Los Objetivos Deben ser SMART</h4>
+                            <div class="grid grid-cols-5 gap-2 text-center text-xs">
+                                <div class="bg-warm-100 dark:bg-warm-900/30 rounded-xl p-3"><div class="text-2xl font-bold text-warm-600">S</div><div class="mt-1 font-semibold">Específico</div></div>
+                                <div class="bg-warm-100 dark:bg-warm-900/30 rounded-xl p-3"><div class="text-2xl font-bold text-warm-600">M</div><div class="mt-1 font-semibold">Medible</div></div>
+                                <div class="bg-warm-100 dark:bg-warm-900/30 rounded-xl p-3"><div class="text-2xl font-bold text-warm-600">A</div><div class="mt-1 font-semibold">Alcanzable</div></div>
+                                <div class="bg-warm-100 dark:bg-warm-900/30 rounded-xl p-3"><div class="text-2xl font-bold text-warm-600">R</div><div class="mt-1 font-semibold">Relevante</div></div>
+                                <div class="bg-warm-100 dark:bg-warm-900/30 rounded-xl p-3"><div class="text-2xl font-bold text-warm-600">T</div><div class="mt-1 font-semibold">Temporal</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== PROCEDIMIENTOS ===== -->
+                <section id="procedimientos" class="content-section bg-stone-900 dark:bg-darkcard p-8 lg:p-12 rounded-[2.5rem] text-white border border-stone-800">
+                    <span class="section-label" style="color:#e5c49a;"><i class="fas fa-tools mr-1"></i>Técnicas y procedimientos</span>
+                    <h2 class="text-2xl mb-4 flex items-center gap-3 text-white">Guía de Procedimientos de Enfermería</h2>
+                    <p class="text-stone-400 text-sm mb-8 leading-relaxed max-w-2xl">Los procedimientos de enfermería son las intervenciones técnicas que materializan el plan de cuidados. Cada uno debe ejecutarse con rigor técnico, asepsia y comunicación terapéutica activa. Aquí encontrarás los procedimientos más evaluados en el contexto cubano.</p>
+                    <div class="space-y-4">
+                        
+                        <details class="group bg-stone-800 rounded-2xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer font-bold list-none flex justify-between items-center hover:bg-stone-700 transition-colors">
+                                <span><i class="fas fa-pills text-warm-400 mr-3"></i>Administración de Medicamentos</span>
+                                <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-warm-400"></i>
+                            </summary>
+                            <div class="p-6 text-stone-300 border-t border-stone-700 space-y-4">
+                                <p>La administración de medicamentos es uno de los procedimientos con mayor potencial de error y, por tanto, de mayor responsabilidad para la enfermería. El cumplimiento estricto de los <strong class="text-warm-300">10 Correctos</strong> —una evolución de las clásicas "5 Reglas de Oro"— es obligatorio en toda institución del Sistema Nacional de Salud cubano.</p>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs text-center">
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-user text-warm-400 mb-1 block"></i>Paciente correcto</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-capsules text-warm-400 mb-1 block"></i>Medicamento correcto</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-weight text-warm-400 mb-1 block"></i>Dosis correcta</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-route text-warm-400 mb-1 block"></i>Vía correcta</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-clock text-warm-400 mb-1 block"></i>Hora correcta</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-pen text-warm-400 mb-1 block"></i>Registro correcto</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-info-circle text-warm-400 mb-1 block"></i>Educación al paciente</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-allergies text-warm-400 mb-1 block"></i>Verificar alergias</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-eye text-warm-400 mb-1 block"></i>Acción y efecto</div>
+                                    <div class="bg-stone-700 rounded-xl p-3"><i class="fas fa-question-circle text-warm-400 mb-1 block"></i>Derecho a negarse</div>
+                                </div>
+                                <p class="text-xs text-stone-400">Antes de administrar cualquier medicamento: verificar orden médica, revisar historial de alergias, comprobar fecha de caducidad, preparar en superficie limpia y documentar inmediatamente tras la administración.</p>
+                            </div>
+                        </details>
+
+                        <details class="group bg-stone-800 rounded-2xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer font-bold list-none flex justify-between items-center hover:bg-stone-700 transition-colors">
+                                <span><i class="fas fa-heartbeat text-warm-400 mr-3"></i>Control de Signos Vitales</span>
+                                <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-warm-400"></i>
+                            </summary>
+                            <div class="p-6 text-stone-300 border-t border-stone-700 space-y-4">
+                                <p>Los signos vitales son los indicadores más inmediatos del estado fisiológico del paciente. Su medición precisa y su interpretación contextualizada son competencias nucleares de la enfermería. El MINSAP establece rangos normales diferenciados por grupos etarios.</p>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs">
+                                        <thead><tr class="bg-stone-700">
+                                            <th class="p-3 text-left text-warm-300">Signo Vital</th>
+                                            <th class="p-3 text-left text-warm-300">Adulto Normal</th>
+                                            <th class="p-3 text-left text-warm-300">Técnica</th>
+                                            <th class="p-3 text-left text-warm-300">Alertas</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            <tr class="border-t border-stone-700"><td class="p-3 font-semibold">TA (Presión Arterial)</td><td class="p-3">≤120/80 mmHg</td><td class="p-3">Brazalete a nivel cardíaco, reposo previo 5 min</td><td class="p-3 text-red-400">&gt;140/90: HTA; &lt;90/60: hipotensión</td></tr>
+                                            <tr class="border-t border-stone-700"><td class="p-3 font-semibold">FC (Pulso)</td><td class="p-3">60–100 lpm</td><td class="p-3">Radial: 60 seg completos, notar ritmo y amplitud</td><td class="p-3 text-red-400">&lt;60: bradicardia; &gt;100: taquicardia</td></tr>
+                                            <tr class="border-t border-stone-700"><td class="p-3 font-semibold">FR (Respiración)</td><td class="p-3">12–20 rpm</td><td class="p-3">Sin avisar al paciente, 60 seg observando tórax</td><td class="p-3 text-red-400">&lt;12: bradipnea; &gt;20: taquipnea</td></tr>
+                                            <tr class="border-t border-stone-700"><td class="p-3 font-semibold">Tª (Temperatura)</td><td class="p-3">36.0–37.5°C</td><td class="p-3">Axilar: 5 min; Oral: 3 min; Rectal: 2 min</td><td class="p-3 text-red-400">&gt;38°C: fiebre; &lt;36°C: hipotermia</td></tr>
+                                            <tr class="border-t border-stone-700"><td class="p-3 font-semibold">SatO₂</td><td class="p-3">95–100%</td><td class="p-3">Pulsioxímetro en dedo sin esmalte ni hipoperfusión</td><td class="p-3 text-red-400">&lt;90%: hipoxemia grave</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </details>
+
+                        <details class="group bg-stone-800 rounded-2xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer font-bold list-none flex justify-between items-center hover:bg-stone-700 transition-colors">
+                                <span><i class="fas fa-hand-sparkles text-warm-400 mr-3"></i>Higiene y Lavado de Manos</span>
+                                <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-warm-400"></i>
+                            </summary>
+                            <div class="p-6 text-stone-300 border-t border-stone-700 space-y-3">
+                                <p>La OMS establece los <strong class="text-warm-300">"5 Momentos del Lavado de Manos"</strong>: antes de tocar al paciente, antes de realizar una tarea limpia/aséptica, después del riesgo de exposición a fluidos corporales, después de tocar al paciente y después del contacto con el entorno del paciente. El lavado clínico con agua y jabón dura 40–60 segundos; el frotado con solución alcohólica, 20–30 segundos.</p>
+                                <p class="text-xs text-stone-400">Esta medida simple es la intervención con mayor evidencia científica para la reducción de infecciones nosocomiales. En Cuba, las campañas del MINSAP refuerzan permanentemente su práctica en todas las instituciones de salud.</p>
+                            </div>
+                        </details>
+
+                        <details class="group bg-stone-800 rounded-2xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer font-bold list-none flex justify-between items-center hover:bg-stone-700 transition-colors">
+                                <span><i class="fas fa-baby text-warm-400 mr-3"></i>Maniobras de Leopold (Obstetricia)</span>
+                                <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-warm-400"></i>
+                            </summary>
+                            <div class="p-6 text-stone-300 border-t border-stone-700 space-y-4">
+                                <p>Las maniobras de Leopold son un método de exploración física abdominal realizado en la mujer embarazada para determinar la estática fetal. Se realizan en cuatro tiempos, con la gestante en decúbito supino y la vejiga vacía:</p>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex gap-3 bg-stone-700 rounded-xl p-3"><span class="font-bold text-warm-300 w-6">I.</span><span><strong>Fondo uterino:</strong> Ambas manos sobre el fondo. Determina qué polo fetal ocupa el fondo (nalgas = irregular, blando; cabeza = redonda, dura, peloteable).</span></div>
+                                    <div class="flex gap-3 bg-stone-700 rounded-xl p-3"><span class="font-bold text-warm-300 w-6">II.</span><span><strong>Laterales:</strong> Manos en flancos uterinos. Identifica la posición fetal (dorso = superficie lisa y resistente; extremidades = partes pequeñas irregulares).</span></div>
+                                    <div class="flex gap-3 bg-stone-700 rounded-xl p-3"><span class="font-bold text-warm-300 w-6">III.</span><span><strong>Presentación:</strong> Mano sobre el estrecho superior. Confirma la presentación y si está encajada (no pelotea) o no (pelotea libremente).</span></div>
+                                    <div class="flex gap-3 bg-stone-700 rounded-xl p-3"><span class="font-bold text-warm-300 w-6">IV.</span><span><strong>Grado de encajamiento:</strong> Enfermera de espaldas a la paciente, manos sobre flancos inferiores. Evalúa la profundidad de descenso de la presentación en la pelvis.</span></div>
+                                </div>
+                            </div>
+                        </details>
+
+                        <details class="group bg-stone-800 rounded-2xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer font-bold list-none flex justify-between items-center hover:bg-stone-700 transition-colors">
+                                <span><i class="fas fa-band-aid text-warm-400 mr-3"></i>Curación y Cuidado de Heridas</span>
+                                <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-warm-400"></i>
+                            </summary>
+                            <div class="p-6 text-stone-300 border-t border-stone-700 space-y-3">
+                                <p>El cuidado de heridas requiere conocimiento del proceso de cicatrización (hemostasia → inflamación → proliferación → remodelación), capacidad de valoración del lecho de la herida (escala TIME: Tejido, Infección, Humedad, Epitelización) y selección del apósito adecuado según el tipo de herida y el estadio. En Cuba, la medicina natural y tradicional —miel de abeja, aceite de girasol— forma parte del arsenal terapéutico oficial para heridas crónicas según las guías del MINSAP.</p>
+                            </div>
+                        </details>
+                    </div>
+                </section>
+
+                <!-- ===== CASOS CLÍNICOS ===== -->
+                <section id="casos" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-file-medical-alt mr-1"></i>Aplicación práctica</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Casos Clínicos Resueltos</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>El verdadero dominio del PAE se demuestra en la capacidad de aplicarlo a situaciones clínicas concretas. Los siguientes casos, representativos de la práctica cubana, ilustran cómo el ciclo PAE se desarrolla en contextos reales y frecuentes.</p>
+
+                        <!-- Caso 1 -->
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl overflow-hidden border border-warm-100 dark:border-warm-900/40">
+                            <div class="bg-warm-500 text-white p-5">
+                                <div class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Caso Clínico 01 · Medicina Interna</div>
+                                <h4 class="text-lg font-bold">Paciente masculino, 68 años, HTA + DM tipo 2</h4>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div>
+                                    <h5 class="font-bold text-warm-700 dark:text-warm-300 mb-2">Presentación</h5>
+                                    <p class="text-sm leading-relaxed">Juan R., 68 años, hipertenso de larga data e insulinodependiente, acude al consultorio por referir "cansancio extremo, mucha sed y me duelen los pies en la noche." TA: 155/95 mmHg. Glucemia capilar: 18.2 mmol/L. Temperatura: 37.1°C. Presenta úlcera neuropática en la planta del pie derecho, 2 cm de diámetro, sin signos inflamatorios activos. El paciente vive solo, su hija vive en otra provincia y reconoce que "a veces me olvido de la insulina."</p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                    <div class="bg-white dark:bg-darkcard rounded-xl p-4">
+                                        <div class="font-bold text-warm-600 mb-2">Diagnósticos de Enfermería</div>
+                                        <ul class="space-y-1 text-xs text-stone-500">
+                                            <li>• Manejo ineficaz de la salud relacionado con déficit de apoyo social y olvido del régimen terapéutico</li>
+                                            <li>• Deterioro de la integridad cutánea relacionado con neuropatía diabética</li>
+                                            <li>• Riesgo de glucemia inestable relacionado con adherencia terapéutica deficiente</li>
+                                            <li>• Dolor crónico relacionado con neuropatía periférica</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-white dark:bg-darkcard rounded-xl p-4">
+                                        <div class="font-bold text-warm-600 mb-2">Resultados NOC (Prioritarios)</div>
+                                        <ul class="space-y-1 text-xs text-stone-500">
+                                            <li>• Conocimiento: régimen terapéutico — puntuación ≥3 en 2 semanas</li>
+                                            <li>• Control de glucemia — HbA1c &lt;7% en 3 meses</li>
+                                            <li>• Cicatrización de la herida — cierre completo en 6 semanas</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-white dark:bg-darkcard rounded-xl p-4">
+                                        <div class="font-bold text-warm-600 mb-2">Intervenciones NIC</div>
+                                        <ul class="space-y-1 text-xs text-stone-500">
+                                            <li>• Enseñanza: régimen medicamentoso (insulinoterapia)</li>
+                                            <li>• Cuidado de heridas: úlcera del pie diabético</li>
+                                            <li>• Monitorización de glucemia capilar</li>
+                                            <li>• Apoyo para la toma de decisiones + coordinación con trabajadora social</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Caso 2 -->
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl overflow-hidden border border-warm-100 dark:border-warm-900/40">
+                            <div class="bg-warm-700 text-white p-5">
+                                <div class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Caso Clínico 02 · Obstetricia</div>
+                                <h4 class="text-lg font-bold">Gestante, 24 años, 38 semanas, primigesta</h4>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div>
+                                    <h5 class="font-bold text-warm-700 dark:text-warm-300 mb-2">Presentación</h5>
+                                    <p class="text-sm leading-relaxed">María L., 24 años, primigesta a las 38 semanas de gestación, ingresa al servicio de obstetricia con contracciones uterinas regulares cada 5 minutos, duración 40 segundos. Refiere miedo e incertidumbre: "No sé si voy a poder hacerlo." Maniobras de Leopold: presentación cefálica, dorso izquierdo, no encajada. FCF: 142 lpm. TA: 118/75 mmHg. Sin edemas. El esposo permanece en la sala de espera y pregunta si puede acompañarla.</p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <div class="bg-white dark:bg-darkcard rounded-xl p-4">
+                                        <div class="font-bold text-warm-600 mb-2">Diagnósticos</div>
+                                        <ul class="space-y-1 text-xs text-stone-500">
+                                            <li>• Ansiedad relacionada con proceso de parto desconocido, manifestada por verbalización de miedo</li>
+                                            <li>• Disposición para mejorar el proceso de maternidad</li>
+                                            <li>• Dolor agudo relacionado con contracciones uterinas</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-white dark:bg-darkcard rounded-xl p-4">
+                                        <div class="font-bold text-warm-600 mb-2">Intervenciones clave</div>
+                                        <ul class="space-y-1 text-xs text-stone-500">
+                                            <li>• Disminución de la ansiedad: explicar cada procedimiento, presencia empática</li>
+                                            <li>• Facilitar la presencia familiar (permitir acompañante en sala de parto)</li>
+                                            <li>• Monitorización fetal continua</li>
+                                            <li>• Manejo no farmacológico del dolor: técnicas de respiración, deambulación</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== ERRORES FRECUENTES ===== -->
+                <section id="errores" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-exclamation-triangle mr-1"></i>Aprender del error</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Errores Frecuentes en la Aplicación del PAE</h2>
+                    <div class="space-y-5 text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p>Conocer los errores más comunes en la aplicación del PAE es tan importante como conocer el proceso mismo. La mayor parte de los fallos en la práctica clínica no son de conocimiento sino de aplicación: el profesional conoce la teoría pero no la traslada correctamente al caso concreto.</p>
+                        <div class="space-y-4">
+                            <div class="flex gap-4 p-5 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+                                <div class="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center text-red-500 flex-shrink-0 mt-0.5"><i class="fas fa-times text-sm"></i></div>
+                                <div>
+                                    <div class="font-bold text-red-700 dark:text-red-400 mb-1">Confundir el diagnóstico de enfermería con el diagnóstico médico</div>
+                                    <p class="text-sm leading-relaxed">Escribir "Diabetes mellitus tipo 2" como diagnóstico de enfermería es un error fundamental. La enfermería diagnostica respuestas humanas: "Manejo ineficaz de la salud", "Desequilibrio nutricional", "Riesgo de glucemia inestable" son los diagnósticos correctos para este paciente.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 p-5 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+                                <div class="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center text-red-500 flex-shrink-0 mt-0.5"><i class="fas fa-times text-sm"></i></div>
+                                <div>
+                                    <div class="font-bold text-red-700 dark:text-red-400 mb-1">Objetivos no medibles o sin límite temporal</div>
+                                    <p class="text-sm leading-relaxed">"El paciente mejorará su dolor" no es un objetivo válido. No es medible ni temporal. La versión correcta: "El paciente reportará EVA ≤ 3/10 a las 4 horas de administrado el analgésico." Si no puedes evaluar si se cumplió, el objetivo está mal formulado.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 p-5 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+                                <div class="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center text-red-500 flex-shrink-0 mt-0.5"><i class="fas fa-times text-sm"></i></div>
+                                <div>
+                                    <div class="font-bold text-red-700 dark:text-red-400 mb-1">Valoración incompleta o sesgada</div>
+                                    <p class="text-sm leading-relaxed">Centrarse solo en el motivo de consulta y descuidar las otras 13 necesidades de Henderson. Un paciente ingresado por bronconeumonía puede tener también ansiedad severa, desnutrición o riesgo de úlcera por presión que, si no se detectan en la valoración inicial, jamás recibirán atención.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 p-5 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-900/30">
+                                <div class="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-500 flex-shrink-0 mt-0.5"><i class="fas fa-exclamation text-sm"></i></div>
+                                <div>
+                                    <div class="font-bold text-amber-700 dark:text-amber-400 mb-1">No registrar o registrar inadecuadamente</div>
+                                    <p class="text-sm leading-relaxed">En enfermería existe el principio: "Lo que no se documenta, no se hizo." El registro clínico es evidencia legal, herramienta de continuidad del cuidado y base para la investigación. Registros incompletos, ilegibles o postdatados son una falta ética y potencialmente legal.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 p-5 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-900/30">
+                                <div class="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-500 flex-shrink-0 mt-0.5"><i class="fas fa-exclamation text-sm"></i></div>
+                                <div>
+                                    <div class="font-bold text-amber-700 dark:text-amber-400 mb-1">Olvidar incluir al paciente y la familia en el plan</div>
+                                    <p class="text-sm leading-relaxed">El PAE no es algo que la enfermera hace "sobre" el paciente: es algo que construye "con" él. Un plan de cuidados que el paciente no comprende o no acepta es un plan condenado al fracaso. La negociación de objetivos y la educación para la salud son componentes irrenunciables del proceso.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== AUTOEVALUACIÓN ===== -->
+                <section id="evaluacion" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-vial mr-1"></i>Pon a prueba tu conocimiento</span>
+                    <h2 class="text-2xl mb-2 flex items-center gap-3 text-warm-700 dark:text-warm-300"><i class="fas fa-tasks text-warm-500"></i> Autoevaluación Interactiva</h2>
+                    <p class="text-sm text-stone-500 mb-8">Responde cada pregunta y recibe retroalimentación inmediata. Estas preguntas reflejan el nivel de los exámenes estatales de enfermería en Cuba.</p>
+                    
+                    <div id="quiz" class="space-y-8">
+                        <!-- P1 -->
+                        <div class="space-y-4 pb-6 border-b border-warm-100 dark:border-warm-900/30">
+                            <p class="font-bold text-base">1. ¿En cuál etapa del PAE se realizan las Maniobras de Leopold?</p>
+                            <div class="grid grid-cols-1 gap-3">
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p1" value="a" class="w-5 h-5 accent-warm-500">
+                                    <span>A) Diagnóstico</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p1" value="b" class="w-5 h-5 accent-warm-500">
+                                    <span>B) Valoración ✓</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p1" value="c" class="w-5 h-5 accent-warm-500">
+                                    <span>C) Planificación</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p1" value="d" class="w-5 h-5 accent-warm-500">
+                                    <span>D) Ejecución</span>
+                                </label>
+                            </div>
+                            <div id="fb1" class="hidden text-sm p-4 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-900/30">
+                                <strong>Correcto.</strong> Las Maniobras de Leopold son una técnica de exploración física abdominal que forma parte de la <strong>Valoración</strong> obstétrica. Permiten determinar la estática fetal y son parte del examen físico cefalocaudal aplicado a la gestante.
+                            </div>
+                        </div>
+
+                        <!-- P2 -->
+                        <div class="space-y-4 pb-6 border-b border-warm-100 dark:border-warm-900/30">
+                            <p class="font-bold text-base">2. Según la escuela cubana, la valoración de enfermería debe ser:</p>
+                            <div class="grid grid-cols-1 gap-3">
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p2" value="a" class="w-5 h-5 accent-warm-500">
+                                    <span>A) Fragmentada y rápida para optimizar el tiempo</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p2" value="b" class="w-5 h-5 accent-warm-500">
+                                    <span>B) Holística, sistemática y continua ✓</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p2" value="c" class="w-5 h-5 accent-warm-500">
+                                    <span>C) Centrada exclusivamente en los síntomas físicos</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p2" value="d" class="w-5 h-5 accent-warm-500">
+                                    <span>D) Delegada al personal auxiliar</span>
+                                </label>
+                            </div>
+                            <div id="fb2" class="hidden text-sm p-4 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-900/30">
+                                <strong>Correcto.</strong> La escuela cubana, fundamentada en el modelo de Henderson y el enfoque bio-psico-social, exige que la valoración sea <strong>holística</strong> (abarca todas las dimensiones del ser humano), <strong>sistemática</strong> (sigue un método estructurado) y <strong>continua</strong> (no es un evento único sino un proceso permanente durante toda la atención).
+                            </div>
+                        </div>
+
+                        <!-- P3 -->
+                        <div class="space-y-4 pb-6 border-b border-warm-100 dark:border-warm-900/30">
+                            <p class="font-bold text-base">3. El diagnóstico de enfermería "Riesgo de infección relacionado con catéter venoso central" es un diagnóstico de tipo:</p>
+                            <div class="grid grid-cols-1 gap-3">
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p3" value="a" class="w-5 h-5 accent-warm-500">
+                                    <span>A) Real, con características definitorias objetivas</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p3" value="b" class="w-5 h-5 accent-warm-500">
+                                    <span>B) De riesgo o potencial ✓</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p3" value="c" class="w-5 h-5 accent-warm-500">
+                                    <span>C) De bienestar o salud</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p3" value="d" class="w-5 h-5 accent-warm-500">
+                                    <span>D) Médico secundario</span>
+                                </label>
+                            </div>
+                            <div id="fb3" class="hidden text-sm p-4 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-900/30">
+                                <strong>Correcto.</strong> Un diagnóstico de <strong>riesgo</strong> describe una respuesta humana que aún no existe pero para la que el paciente es vulnerable debido a factores de riesgo identificados. NO tiene características definitorias (síntomas) porque el problema todavía no ha ocurrido. Su objetivo es la prevención.
+                            </div>
+                        </div>
+
+                        <!-- P4 -->
+                        <div class="space-y-4 pb-6 border-b border-warm-100 dark:border-warm-900/30">
+                            <p class="font-bold text-base">4. ¿Cuántas Necesidades Básicas identifica el Modelo de Virginia Henderson?</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p4" value="a" class="w-5 h-5 accent-warm-500"><span>A) 10</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p4" value="b" class="w-5 h-5 accent-warm-500"><span>B) 12</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p4" value="c" class="w-5 h-5 accent-warm-500"><span>C) 14 ✓</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p4" value="d" class="w-5 h-5 accent-warm-500"><span>D) 16</span>
+                                </label>
+                            </div>
+                            <div id="fb4" class="hidden text-sm p-4 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-900/30">
+                                <strong>Correcto.</strong> Virginia Henderson identificó <strong>14 Necesidades Básicas</strong> que van desde las fisiológicas (respirar, comer, eliminar) hasta las más complejas (comunicarse, aprender, trabajar). Este modelo es la base de la valoración de enfermería en Cuba.
+                            </div>
+                        </div>
+
+                        <!-- P5 -->
+                        <div class="space-y-4">
+                            <p class="font-bold text-base">5. En la fórmula PES del diagnóstico de enfermería, la "S" corresponde a:</p>
+                            <div class="grid grid-cols-1 gap-3">
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p5" value="a" class="w-5 h-5 accent-warm-500"><span>A) Situación del paciente</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p5" value="b" class="w-5 h-5 accent-warm-500"><span>B) Síntomas o características definitorias ✓</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p5" value="c" class="w-5 h-5 accent-warm-500"><span>C) Seguimiento del plan de cuidados</span>
+                                </label>
+                                <label class="quiz-option flex items-center gap-3 p-4 rounded-2xl border-2 border-warm-100 dark:border-stone-700 cursor-pointer hover:bg-warm-50 dark:hover:bg-darksec transition-colors">
+                                    <input type="radio" name="p5" value="d" class="w-5 h-5 accent-warm-500"><span>D) Severidad del problema</span>
+                                </label>
+                            </div>
+                            <div id="fb5" class="hidden text-sm p-4 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-900/30">
+                                <strong>Correcto.</strong> En la fórmula PES: <strong>P</strong> = Problema (etiqueta diagnóstica NANDA), <strong>E</strong> = Etiología (factor relacionado o causal), <strong>S</strong> = Sintomatología (características definitorias: los datos objetivos y subjetivos que evidencian el problema). Esta fórmula solo aplica a los diagnósticos reales.
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex gap-4 flex-wrap">
+                            <button onclick="evaluarQuiz()" class="bg-warm-500 hover:bg-warm-600 text-white font-bold px-8 py-3 rounded-2xl transition-colors shadow-md shadow-warm-500/20">
+                                <i class="fas fa-check-circle mr-2"></i>Verificar respuestas
+                            </button>
+                            <button onclick="reiniciarQuiz()" class="bg-warm-100 dark:bg-darksec hover:bg-warm-200 dark:hover:bg-stone-700 text-warm-700 dark:text-warm-300 font-bold px-8 py-3 rounded-2xl transition-colors">
+                                <i class="fas fa-redo mr-2"></i>Reiniciar
+                            </button>
+                        </div>
+                        <div id="score-result" class="hidden mt-4 p-5 rounded-2xl bg-warm-50 dark:bg-darksec border border-warm-200 dark:border-warm-900/40 text-center">
+                            <div id="score-text" class="text-2xl font-bold text-warm-700 dark:text-warm-300"></div>
+                            <div id="score-msg" class="text-sm text-stone-500 mt-1"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== GLOSARIO ===== -->
+                <section id="glosario" class="content-section bg-white dark:bg-darkcard p-8 lg:p-10 rounded-[2.5rem] shadow-sm border border-warm-100 dark:border-warm-900/40">
+                    <span class="section-label"><i class="fas fa-spell-check mr-1"></i>Vocabulario técnico</span>
+                    <h2 class="text-2xl mb-6 text-warm-700 dark:text-warm-300">Glosario Técnico de Enfermería</h2>
+                    <p class="text-sm text-stone-500 mb-6">El dominio del lenguaje técnico es parte del dominio de la disciplina. Un profesional que no maneja con precisión el vocabulario de enfermería comunicará con ambigüedad y actuará con imprecisión.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">PAE:</span> <span class="text-stone-600 dark:text-stone-400">Proceso de Atención de Enfermería. Método científico aplicado al cuidado.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">NANDA:</span> <span class="text-stone-600 dark:text-stone-400">North American Nursing Diagnosis Association. Taxonomía internacional de diagnósticos enfermeros.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">NOC:</span> <span class="text-stone-600 dark:text-stone-400">Nursing Outcomes Classification. Sistema de clasificación de resultados sensibles a la enfermería.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">NIC:</span> <span class="text-stone-600 dark:text-stone-400">Nursing Interventions Classification. Taxonomía de intervenciones de enfermería basadas en evidencia.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Valoración:</span> <span class="text-stone-600 dark:text-stone-400">Primera etapa del PAE. Recogida sistemática de datos subjetivos y objetivos.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Dx de enfermería:</span> <span class="text-stone-600 dark:text-stone-400">Juicio clínico sobre las respuestas humanas ante problemas de salud o procesos vitales.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Dato subjetivo:</span> <span class="text-stone-600 dark:text-stone-400">Información que sólo el paciente puede proporcionar: síntomas, percepciones, sentimientos.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Dato objetivo:</span> <span class="text-stone-600 dark:text-stone-400">Información observable y medible: signos vitales, hallazgos físicos, resultados de laboratorio.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Formulación PES:</span> <span class="text-stone-600 dark:text-stone-400">Estructura del diagnóstico real: Problema + Etiología + Sintomatología.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">EVA:</span> <span class="text-stone-600 dark:text-stone-400">Escala Visual Analógica del dolor. Numeración del 0 (sin dolor) al 10 (dolor insoportable).</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Maniobras de Leopold:</span> <span class="text-stone-600 dark:text-stone-400">Técnica de palpación abdominal en gestantes para determinar la estática fetal. Cuatro tiempos.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Estática fetal:</span> <span class="text-stone-600 dark:text-stone-400">Relación del feto con la pelvis y el útero: situación, presentación, posición y variedad.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">FCF:</span> <span class="text-stone-600 dark:text-stone-400">Frecuencia Cardíaca Fetal. Normal: 120–160 lpm en el embarazo a término.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">MINSAP:</span> <span class="text-stone-600 dark:text-stone-400">Ministerio de Salud Pública de Cuba. Ente rector del sistema de salud y de las guías clínicas.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Cefalocaudal:</span> <span class="text-stone-600 dark:text-stone-400">Dirección del examen físico: de cabeza a pies, de forma sistemática y sin omitir regiones.</span></div>
+                        <div class="bg-warm-50 dark:bg-darksec rounded-2xl p-4"><span class="font-bold text-warm-700 dark:text-warm-300">Autocuidado:</span> <span class="text-stone-600 dark:text-stone-400">Acciones que el individuo realiza para mantener su propia salud. Base del modelo de Orem.</span></div>
+                    </div>
+                </section>
+
+                <!-- ===== BIBLIOGRAFÍA ===== -->
+                <section id="bibliografia" class="content-section space-y-8">
+                    <span class="section-label px-2"><i class="fas fa-bookmark mr-1"></i>Fuentes académicas</span>
+                    <h2 class="text-2xl flex items-center gap-4 px-2"><i class="fas fa-book text-warm-500"></i> Referencias Bibliográficas</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-darkcard p-8 rounded-[2rem] border border-warm-100 dark:border-warm-900/40 shadow-sm">
+                            <h3 class="text-lg text-warm-600 dark:text-warm-400 mb-6 flex items-center gap-2">
+                                <i class="fas fa-star"></i> Cuba — ECIMED
+                            </h3>
+                            <ul class="text-xs space-y-5 text-stone-500 dark:text-stone-400">
+                                <li class="border-l-2 border-warm-400 pl-4 leading-relaxed"><strong>Bello Fernández, N. L. (2006).</strong> Diseño Curricular de Enfermería. La Habana: Editorial Ciencias Médicas.</li>
+                                <li class="border-l-2 border-warm-400 pl-4 leading-relaxed"><strong>Fenton Tait, M. C. (2005).</strong> Temas de Enfermería Médico-Quirúrgica. La Habana: Editorial Ciencias Médicas.</li>
+                                <li class="border-l-2 border-warm-400 pl-4 leading-relaxed"><strong>MINSAP (2017).</strong> Manual de Procedimientos de Enfermería en la Atención Primaria de Salud. La Habana: Editorial Ciencias Médicas.</li>
+                                <li class="border-l-2 border-warm-400 pl-4 leading-relaxed"><strong>Colectivo de autores ECIMED (2012).</strong> Enfermería Comunitaria. La Habana: Editorial Ciencias Médicas.</li>
+                                <li class="border-l-2 border-warm-400 pl-4 leading-relaxed"><strong>Hernández Díaz, M. (2009).</strong> Administración en Enfermería. La Habana: Editorial Ciencias Médicas.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-darkcard p-8 rounded-[2rem] border border-warm-100 dark:border-warm-900/40 shadow-sm">
+                            <h3 class="text-lg text-stone-800 dark:text-stone-100 mb-6 flex items-center gap-2">
+                                <i class="fas fa-globe"></i> Internacional
+                            </h3>
+                            <ul class="text-xs space-y-5 text-stone-500 dark:text-stone-400">
+                                <li class="border-l-2 border-stone-300 dark:border-stone-600 pl-4 leading-relaxed"><strong>NANDA International (2021–2023).</strong> Diagnósticos Enfermeros: Definiciones y Clasificación. Barcelona: Elsevier.</li>
+                                <li class="border-l-2 border-stone-300 dark:border-stone-600 pl-4 leading-relaxed"><strong>Moorhead, S. et al. (2018).</strong> Clasificación de Resultados de Enfermería (NOC). 6ª ed. Barcelona: Elsevier.</li>
+                                <li class="border-l-2 border-stone-300 dark:border-stone-600 pl-4 leading-relaxed"><strong>Bulechek, G. M. et al. (2018).</strong> Clasificación de Intervenciones de Enfermería (NIC). 7ª ed. Barcelona: Elsevier.</li>
+                                <li class="border-l-2 border-stone-300 dark:border-stone-600 pl-4 leading-relaxed"><strong>Potter, P. A. & Perry, A. G. (2019).</strong> Fundamentos de Enfermería. 9ª ed. Madrid: Elsevier.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-darkcard p-8 rounded-[2rem] border border-warm-100 dark:border-warm-900/40 shadow-sm md:col-span-2">
+                            <h3 class="text-lg text-stone-800 dark:text-stone-100 mb-6 flex items-center gap-2">
+                                <i class="fas fa-newspaper"></i> Investigaciones y Artículos Cubanos
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                <ul class="text-xs space-y-5 text-stone-500 dark:text-stone-400">
+                                    <li class="border-l-2 border-warm-300 pl-4 leading-relaxed"><strong>León Román, C. A. (2004).</strong> La Enfermería, Ciencia y Arte del Cuidado Humano: Aplicación del Método Científico. <em>Revista Cubana de Enfermería, 20(1).</em></li>
+                                    <li class="border-l-2 border-warm-300 pl-4 leading-relaxed"><strong>Rodríguez Abrahantes, T. N. (2018).</strong> El PAE desde el Pensamiento Crítico. Estrategias para su Enseñanza en la Facultad de Ciencias Médicas de Camagüey.</li>
+                                </ul>
+                                <ul class="text-xs space-y-5 text-stone-500 dark:text-stone-400">
+                                    <li class="border-l-2 border-warm-300 pl-4 leading-relaxed"><strong>Morales Morales, I. (2015).</strong> Aplicación del PAE en la Atención a Pacientes con Diabetes Mellitus tipo 2. <em>Revista Cubana de Medicina General Integral, 31(3).</em></li>
+                                    <li class="border-l-2 border-warm-300 pl-4 leading-relaxed"><strong>Pérez Leyva, E. H. (2020).</strong> Diagnósticos de Enfermería más frecuentes en la Unidad de Cuidados Intensivos Pediátricos. <em>Revista Habanera de Ciencias Médicas.</em></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="text-center text-stone-400 py-10 text-[10px] font-bold uppercase tracking-[0.2em] border-t border-warm-100 dark:border-warm-900/30 space-y-2">
+                    <div>PAE-Master &bull; Formación de Enfermería &bull; Cuba 2026</div>
+                    <div class="text-[9px] opacity-60">Aplicación educativa sin fines comerciales &bull; Uso académico</div>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ---- UI ----
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                if (window.innerWidth < 1024) toggleMenu();
+            });
+        });
+
+        // ---- Theme ----
+        document.getElementById('theme-toggle').onclick = () => {
+            document.documentElement.classList.toggle('dark');
+        };
+
+        // ---- Quiz ----
+        const correctAnswers = { p1: 'b', p2: 'b', p3: 'b', p4: 'c', p5: 'b' };
+
+        function evaluarQuiz() {
+            let score = 0;
+            const total = Object.keys(correctAnswers).length;
+
+            for (const [name, correct] of Object.entries(correctAnswers)) {
+                const selected = document.querySelector(`input[name="${name}"]:checked`);
+                const options = document.querySelectorAll(`input[name="${name}"]`);
+                const fbNum = name.replace('p', '');
+                const fbEl = document.getElementById('fb' + fbNum);
+
+                options.forEach(opt => {
+                    const label = opt.closest('label');
+                    label.classList.remove('correct', 'incorrect');
+                    if (opt.value === correct) label.classList.add('correct');
+                    else if (selected && opt.value === selected.value) label.classList.add('incorrect');
+                });
+
+                if (selected && selected.value === correct) {
+                    score++;
+                    if (fbEl) fbEl.classList.remove('hidden');
+                } else {
+                    if (fbEl) {
+                        fbEl.classList.remove('hidden');
+                        fbEl.classList.remove('bg-green-50', 'text-green-700', 'border-green-100');
+                        if (!selected) {
+                            fbEl.textContent = 'No seleccionaste ninguna respuesta. La respuesta correcta está marcada en verde.';
+                        }
+                    }
+                }
+            }
+
+            const resultEl = document.getElementById('score-result');
+            const textEl = document.getElementById('score-text');
+            const msgEl = document.getElementById('score-msg');
+            resultEl.classList.remove('hidden');
+            textEl.textContent = `${score} / ${total} correctas`;
+
+            const msgs = ['Necesitas repasar el material. ¡Vuelve a leer las secciones anteriores!', 'Vas bien, pero hay áreas por reforzar. Repasa las preguntas incorrectas.', 'Buen desempeño. Revisa los detalles de las respuestas fallidas.', '¡Excelente! Dominas los fundamentos del PAE.', '¡Perfecto! Estás listo para el examen estatal.'];
+            msgEl.textContent = msgs[score] || msgs[0];
+        }
+
+        function reiniciarQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('.quiz-option').forEach(l => l.classList.remove('correct', 'incorrect'));
+            for (let i = 1; i <= 5; i++) {
+                const fb = document.getElementById('fb' + i);
+                if (fb) fb.classList.add('hidden');
+            }
+            document.getElementById('score-result').classList.add('hidden');
+        }
+
+        // ---- Service Worker ----
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
